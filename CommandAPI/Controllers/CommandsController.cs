@@ -2,6 +2,7 @@
 using CommandAPI.Data;
 using CommandAPI.DTO;
 using CommandAPI.Models;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -68,6 +69,32 @@ namespace CommandAPI.Controllers
 
             _mapper.Map(cmdUpdate, cmdModel);
             _commandRepo.UpdateCommand(cmdModel);
+            _commandRepo.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpPatch("{id}")]
+        public ActionResult PartialCommandUpdate(int id,JsonPatchDocument<CommandUpdateDTO> pathDoc)
+        {
+            var cmdModel = _commandRepo.GetCommandById(id);
+            if (cmdModel == null)
+            {
+                return NotFound();
+            }
+
+            var commandToPatch = _mapper.Map<CommandUpdateDTO>(cmdModel);
+            pathDoc.ApplyTo(commandToPatch, ModelState);
+
+            if (!TryValidateModel(commandToPatch))
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            _mapper.Map(commandToPatch, cmdModel);
+
+            _commandRepo.UpdateCommand(cmdModel);
+
             _commandRepo.SaveChanges();
 
             return NoContent();
