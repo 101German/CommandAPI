@@ -19,7 +19,11 @@ namespace CommandAPI.Data
 
         public void CreateCommand(Command cmd)
         {
-            throw new NotImplementedException();
+            if (cmd == null)
+            {
+                throw new ArgumentNullException(nameof(cmd));
+            }
+            _repositoryContext.Add(cmd);
         }
 
         public void DeleteCommand(Command cmd)
