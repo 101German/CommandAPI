@@ -14,6 +14,8 @@ namespace CommandAPI.Profiles
         public CommandProfile()
         {
             CreateMap<Command, CommandReadDTO>();
+            CreateMap<CommandCreateDTO, Command>();
+            CreateMap<CommandUpdateDTO, Command>().ReverseMap();
         }
     }
 }
