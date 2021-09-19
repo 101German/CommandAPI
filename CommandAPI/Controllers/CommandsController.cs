@@ -32,7 +32,7 @@ namespace CommandAPI.Controllers
             return Ok(_mapper.Map<IEnumerable<CommandReadDTO>>(commands));
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}",Name ="GetCompanyById")]
         public ActionResult<Command> GetCompanyById(int id)
         {
             var commandItem = _commandRepo.GetCommandById(id);
@@ -42,6 +42,35 @@ namespace CommandAPI.Controllers
                 return NotFound();
             }
             return Ok(_mapper.Map<CommandReadDTO>(commandItem));
+        }
+
+        [HttpPost]
+        public ActionResult<CommandReadDTO> CreateCommand(CommandCreateDTO cmdDTO)
+        {
+            var cmdModel = _mapper.Map<Command>(cmdDTO);
+            _commandRepo.CreateCommand(cmdModel);
+            _commandRepo.SaveChanges();
+
+            var cmdReadDTO = _mapper.Map<CommandReadDTO>(cmdModel);
+
+            return CreatedAtRoute(nameof(GetCompanyById), new { Id = cmdModel.Id }, cmdReadDTO);
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult UpdateCommand(int id,CommandUpdateDTO cmdUpdate)
+        {
+            var cmdModel = _commandRepo.GetCommandById(id);
+            if (cmdModel == null)
+            {
+                return NotFound();
+            }
+
+
+            _mapper.Map(cmdUpdate, cmdModel);
+            _commandRepo.UpdateCommand(cmdModel);
+            _commandRepo.SaveChanges();
+
+            return NoContent();
         }
     }
 }
