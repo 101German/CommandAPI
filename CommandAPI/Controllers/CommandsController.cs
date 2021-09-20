@@ -4,11 +4,7 @@ using CommandAPI.DTO;
 using CommandAPI.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommandAPI.Controllers
 {
@@ -26,15 +22,15 @@ namespace CommandAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<CommandReadDTO>> Get()
+        public ActionResult<IEnumerable<CommandReadDTO>> GetAllCommands()
         {
             var commands = _commandRepo.GetAllCommands();
 
             return Ok(_mapper.Map<IEnumerable<CommandReadDTO>>(commands));
         }
 
-        [HttpGet("{id}",Name ="GetCompanyById")]
-        public ActionResult<Command> GetCompanyById(int id)
+        [HttpGet("{id}",Name ="GetCommandById")]
+        public ActionResult<CommandReadDTO> GetCommandById(int id)
         {
             var commandItem = _commandRepo.GetCommandById(id);
 
@@ -54,7 +50,7 @@ namespace CommandAPI.Controllers
 
             var cmdReadDTO = _mapper.Map<CommandReadDTO>(cmdModel);
 
-            return CreatedAtRoute(nameof(GetCompanyById), new { Id = cmdModel.Id }, cmdReadDTO);
+            return CreatedAtRoute(nameof(GetCommandById), new { Id = cmdModel.Id }, cmdReadDTO);
         }
 
         [HttpPut("{id}")]
@@ -100,13 +96,13 @@ namespace CommandAPI.Controllers
             return NoContent();
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public ActionResult DeleteCommand(int id)
         {
             var cmdModel = _commandRepo.GetCommandById(id);
             if (cmdModel == null)
             {
-                return NoContent();
+                return NotFound();
             }
 
             _commandRepo.DeleteCommand(cmdModel);
